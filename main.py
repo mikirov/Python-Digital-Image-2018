@@ -18,7 +18,7 @@ image_counter = 0
 
 
 def showPIL(pilImage):
-    root = tkinter.Tk()
+    root = tkinter.Toplevel()
     w, h = root.winfo_screenwidth(), root.winfo_screenheight()
     root.overrideredirect(1)
     root.geometry("%dx%d+0+0" % (w, h))
@@ -35,7 +35,7 @@ def showPIL(pilImage):
         pilImage = pilImage.resize((imgWidth,imgHeight), Image.ANTIALIAS)
     image = ImageTk.PhotoImage(pilImage)
     imagesprite = canvas.create_image(w/2,h/2,image=image)
-    root.mainloop()
+    root.update()
 
 
 
@@ -57,7 +57,8 @@ def download_image(url, image_name):
 def get_art():
 
 	
-	url = "https://backend.deviantart.com/rss.xml?q=boost%3Apopular+max_age%3A24h+in%3Adigitalart%2Fpaintings%2Ffantasy&amp;type=deviation"
+	#url = "https://backend.deviantart.com/rss.xml?q=boost%3Apopular+max_age%3A24h+in%3Adigitalart%2Fpaintings%2Ffantasy&amp;type=deviation"
+	url = "https://backend.deviantart.com/rss.xml?q=boost%3Ahot+in%3Adigitalart%2Fpaintings%2Flandscapes&amp;type=deviation"
 	global image_counter
 
 	response = requests.get(url,timeout = 5.0)
@@ -87,9 +88,8 @@ def main():
 			image_name = str(index) + ".png"
 			im = Image.open(image_name)
 			showPIL(im)
-			time.sleep(10)
+			time.sleep(5)
 			im.close()
-
 
 if __name__ == "__main__" :
 	main()
