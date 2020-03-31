@@ -3,7 +3,7 @@ import time
 import tkinter
 
 import requests
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, UnidentifiedImageError
 
 
 class Visualizer:
@@ -13,13 +13,17 @@ class Visualizer:
         self.__url = url
 
     def run(self):
-        while True:
-            for index in range(0, self.__sequence_number):
-                image_name = str(index) + ".jpg"
+        self.__download_all(self.__url)
+        for index in range(0, self.__sequence_number):
+            image_name = str(index) + ".jpg"
+            try:
                 im = Image.open(image_name)
+
                 self.__display(im)
                 time.sleep(5)
                 im.close()
+            except UnidentifiedImageError:
+                print("UnidentifiedImageError.")
 
     @staticmethod
     def __display(image):
@@ -38,6 +42,18 @@ class Visualizer:
             img_width = int(img_width * ratio)
             img_height = int(img_height * ratio)
             image = image.resize((img_width, img_height), Image.ANTIALIAS)
+        # if img_width > w:
+        #     ratio = w/img_width
+        #     img_width = w
+        #     img_height = h * ratio
+        #     image = image.resize((img_width, img_height), Image.ANTIALIAS)
+        #
+        # elif img_height > h:
+        #     ratio = h / img_height
+        #     img_height = h
+        #     img_width = w * ratio
+        #     image = image.resize((img_width, img_height), Image.ANTIALIAS)
+
         image = ImageTk.PhotoImage(image)
         canvas.create_image(w / 2, h / 2, image=image)
         root.update()
