@@ -19,14 +19,17 @@ class Visualizer:
             self.__download_all(self.__url)
             for index in range(0, self.__sequence_number):
                 image_name = str(index) + ".jpg"
+                im = None
                 try:
                     im = Image.open(image_name)
 
                     self.__display(im)
                     time.sleep(5)
                     im.close()
-                except UnidentifiedImageError:
-                    print("UnidentifiedImageError.")
+                except UnidentifiedImageError as e:
+                    print(e)
+                    if im is not None:
+                        im.close()
 
 
     @staticmethod
@@ -46,17 +49,6 @@ class Visualizer:
             img_width = int(img_width * ratio)
             img_height = int(img_height * ratio)
             image = image.resize((img_width, img_height), Image.ANTIALIAS)
-        # if img_width > w:
-        #     ratio = w/img_width
-        #     img_width = w
-        #     img_height = h * ratio
-        #     image = image.resize((img_width, img_height), Image.ANTIALIAS)
-        #
-        # elif img_height > h:
-        #     ratio = h / img_height
-        #     img_height = h
-        #     img_width = w * ratio
-        #     image = image.resize((img_width, img_height), Image.ANTIALIAS)
 
         image = ImageTk.PhotoImage(image)
         canvas.create_image(w / 2, h / 2, image=image)
@@ -64,20 +56,26 @@ class Visualizer:
 
     @staticmethod
     def __download(url, image_name):
-        r = requests.get(url, timeout=4.0)
-        if r.status_code == requests.codes.ok:
-            f = open(image_name, 'wb+')
-            for chunk in r.iter_content(1024):
-                f.write(chunk)
-            f.close()
-        print('Image downloaded from url: {} and saved to: {}.'.format(url, image_name))
+        try:
+            r = requests.get(url)
+            if r.status_code == requests.codes.ok:
+                f = open(image_name, 'wb+')
+                for chunk in r.iter_content(1024):
+                    f.write(chunk)
+                f.close()
+            print('Image downloaded from url: {} and saved to: {}.'.format(url, image_name))
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            print(e)
 
     def __download_all(self, url):
 
-        # perform get request
-        response = requests.get(self.__url, timeout=5.0)
-        urls = re.findall(r'<media:content\surl=\"(.*?)\".*\/>', response.text)
-        for url in urls:
-            image_name = str(self.__sequence_number) + '.jpg'
-            self.__download(url, image_name)
-            self.__sequence_number += 1
+        try:
+            response = requests.get(self.__url)
+
+            urls = re.findall(r'<media:content\surl=\"(.*?)\".*\/>', response.text)
+            for url in urls:
+                image_name = str(self.__sequence_number) + '.jpg'
+                self.__download(url, image_name)
+                self.__sequence_number += 1
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            print(e)
