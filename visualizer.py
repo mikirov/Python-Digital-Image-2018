@@ -13,17 +13,21 @@ class Visualizer:
         self.__url = url
 
     def run(self):
-        self.__download_all(self.__url)
-        for index in range(0, self.__sequence_number):
-            image_name = str(index) + ".jpg"
-            try:
-                im = Image.open(image_name)
 
-                self.__display(im)
-                time.sleep(5)
-                im.close()
-            except UnidentifiedImageError:
-                print("UnidentifiedImageError.")
+        while True:
+            self.__sequence_number = 0
+            self.__download_all(self.__url)
+            for index in range(0, self.__sequence_number):
+                image_name = str(index) + ".jpg"
+                try:
+                    im = Image.open(image_name)
+
+                    self.__display(im)
+                    time.sleep(5)
+                    im.close()
+                except UnidentifiedImageError:
+                    print("UnidentifiedImageError.")
+
 
     @staticmethod
     def __display(image):
